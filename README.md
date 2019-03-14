@@ -1,1 +1,1 @@
-# symmetry-js
+# symmetry
