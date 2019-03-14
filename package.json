@@ -1,0 +1,35 @@
+{
+  "name": "symmetry",
+  "version": "1.0.0",
+  "description": "JavaScript Framework",
+  "main": "dist/bundle.js",
+  "peerDependencies": {
+    "webpack": "^4.28.1",
+    "webpack-cli": "^3.2.1"
+  },
+  "devDependencies": {
+    "webpack": "^4.28.1",
+    "webpack-cli": "^3.2.1"
+  },
+  "scripts": {
+    "build": "webpack --mode production",
+    "prepublish": "rm -rf ./dist && npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/drewrobinson/symmetry-js.git"
+  },
+  "keywords": [
+    "JavaScript",
+    "Framework"
+  ],
+  "directories": {
+    "src": "src"
+  },
+  "author": "Drew Robinson <hello@drewrobinson.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/drewrobinson/symmetry-js/issues"
+  },
+  "homepage": "https://github.com/drewrobinson/symmetry-js#readme"
+}

@@ -1,3 +1,19 @@
+#local
+demo
+server.js
+webpack.config.js
+.eslintrc
+node_modules
+.babelrc
+.env_aem
+.env_dev
+.env_heroku
+cors.js
+Procfile
+bak-package.json
+bak-webpack.config.js
+dist/
+
 # Logs
 logs
 *.log
