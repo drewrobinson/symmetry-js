@@ -33,7 +33,7 @@ class Mediator {
     Object.getOwnPropertyNames(service.prototype).forEach((prop)=>{
       if(prop !== 'constructor'){
         self.serviceMap[prop] = {
-          name: service.name,
+          name: prop,
           message: _aux.model.MODEL_UPDATED,
           service: _aux,
           fn: _aux[prop]

@@ -1,6 +1,6 @@
 {
-  "name": "symmetry",
-  "version": "1.0.0",
+  "name": "symmetry-js",
+  "version": "1.0.1",
   "description": "JavaScript Framework",
   "main": "dist/bundle.js",
   "peerDependencies": {
