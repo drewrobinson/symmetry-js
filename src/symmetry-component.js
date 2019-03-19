@@ -12,6 +12,13 @@ class Component {
       }
     });
 
+    if(self.constructor.messages){
+      let messages = self.constructor.messages();
+      messages.forEach((msg)=>{
+        self.bus.add(msg);
+      });
+    }
+
   }
 }
 
