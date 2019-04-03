@@ -12,7 +12,7 @@ class Model {
     this.service = service;
     this.data = {};
     this.MODEL_UPDATED = msg;
-    this.service.serviceBus.messages[msg] = msg;
+    this.service.bus.messages[msg] = msg;
   }
 
   /**
@@ -155,7 +155,7 @@ class Model {
     this.data = null;
     this.data = Object.freeze(aux);
 
-    this.service.serviceBus.publish(this.MODEL_UPDATED, this.data);
+    this.service.bus.publish(this.MODEL_UPDATED, this.data);
   }
 }
 

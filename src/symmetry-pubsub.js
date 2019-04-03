@@ -26,15 +26,19 @@ class PubSub {
 
   /**
    * Responsible for registering a listener to message. Wild card (*) will subscribe to all events
-   * @param msg
-   * @param callBack
-   * @param context
+   * @param {String} msg - Required
+   * @param {fn} callBack - Required
+   * @param {} context - Required if callback is not bound
    */
   subscribe(msg, callBack, context) {
     let self = this;
 
-    if (!msg || !callBack) {
-      throw Error("subscribe error: missing required args");
+    if (!msg || !callBack ) {
+      throw Error(`Subscribe Error: missing required args`);
+    }
+
+    if (callBack.name.indexOf('bound') < 0 && !context) {
+      throw Error(`Subscribe Error: ${callBack.name} unbound or missing context`);
     }
 
     //Ensure message exists
@@ -49,9 +53,18 @@ class PubSub {
         l = self.listeners[msg].length;
 
       for (i; i < l; i++) {
-        if (self.listeners[msg][i].callBack === callBack && self.listeners[msg][i].context === context) {
-          throw Error("subscribe error: listener already registered");
+
+        if(callBack.name.indexOf('bound') > -1 && !context){
+
+          if (self.listeners[msg][i].callBack.name == callBack.name) {
+            throw Error(`Subscribe error: ${callBack.name} listener already registered. Include context with arguments. E.g. subscribe(msg, callback, context)`);
+          }
+        }else{
+          if (self.listeners[msg][i].callBack === callBack && self.listeners[msg][i].context === context) {
+            throw Error(`Subscribe error: ${callBack.name} listener already registered with context`);
+          }
         }
+
       }
 
       self.listeners[msg].push({
@@ -65,19 +78,25 @@ class PubSub {
 
   /**
    * Responsible for removing listener
-   * @param msg
-   * @param callBack
-   * @param context
+   * @param {String} msg
+   * @param {fn} callBack
+   * @param {} context - Required if callback is not bound
    */
   unsubscribe(msg, callBack, context) {
     let self = this;
-
     let i = 0,
       l = self.listeners[msg].length;
     for (i; i < l; i++) {
-      if (self.listeners[msg][i].callBack === callBack && self.listeners[msg][i].context === context) {
-        self.listeners[msg].splice(i, 1);
-        break;
+      if(callBack.name.indexOf('bound') > -1){
+        if (self.listeners[msg][i].callBack.name === callBack.name) {
+          self.listeners[msg].splice(i, 1);
+          break;
+        }
+      }else{
+        if (self.listeners[msg][i].callBack.name === callBack.name && self.listeners[msg][i].context === context) {
+          self.listeners[msg].splice(i, 1);
+          break;
+        }
       }
     }
   }

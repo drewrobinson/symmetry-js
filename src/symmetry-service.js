@@ -5,18 +5,46 @@ class Service {
 
   constructor(msg) {
     let self = this;
-    self.serviceBus = Symmetry.Mediator.constructor.getServiceBus();
+    self.bus = Symmetry.Mediator.constructor.getServiceBus();
 
-    Object.assign(self.serviceBus, {
+    Object.assign(self.bus, {
       add:(msg)=> {
-        self.serviceBus.messages[msg] = msg;
+        self.bus.messages[msg] = msg;
       }
     });
 
     self.model = new Model(self, msg);
+  }
 
-    //console.log('Base Service: ', self);
+  /**
+   * Responsible for adding task to Mediator TaskQueue and resolving promise when complete
+   * @desc - Wraps Symmetry.Mediator.queueTask method in promise
+   * @param {String} taskName
+   * @returns {Promise}
+   */
+  queueTask(taskName) {
+    let self = this;
 
+    let _resolve = null;
+
+    let _task = Symmetry.Mediator.serviceMap[taskName];
+
+    if(!_task){
+      throw new Error('task not found');
+    }
+
+    let _cb = function _cb(msg){
+      self.bus.unsubscribe(_task.message, _cb.bind(self));
+      _resolve(msg.data.profile);
+    };
+
+    let msgHandler = function(resolve, reject){
+      _resolve = resolve;
+      self.bus.subscribe(_task.message, _cb.bind(self));
+      Symmetry.Mediator.queueTask(taskName);
+    }
+
+    return new Promise(msgHandler);
   }
 }
 
