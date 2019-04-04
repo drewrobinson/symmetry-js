@@ -35,7 +35,7 @@ class Service {
 
     let _cb = function _cb(msg){
       self.bus.unsubscribe(_task.message, _cb.bind(self));
-      _resolve(msg.data.profile);
+      _resolve(msg);
     };
 
     let msgHandler = function(resolve, reject){
