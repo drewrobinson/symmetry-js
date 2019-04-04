@@ -34,13 +34,13 @@ class Service {
     }
 
     let _cb = function _cb(msg){
-      self.bus.unsubscribe(_task.message, _cb.bind(self));
+      self.bus.unsubscribe(_task.message, _cb, self);
       _resolve(msg);
     };
 
     let msgHandler = function(resolve, reject){
       _resolve = resolve;
-      self.bus.subscribe(_task.message, _cb.bind(self));
+      self.bus.subscribe(_task.message, _cb, self);
       Symmetry.Mediator.queueTask(taskName);
     }
 
