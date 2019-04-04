@@ -46,6 +46,25 @@ class Service {
 
     return new Promise(msgHandler);
   }
+
+  /**
+   * Responsible for invoking synchronous service method
+   * @returns {data} || null
+   */
+  call(taskName){
+    let self = this;
+    let data = null;
+
+    let _task = Symmetry.Mediator.serviceMap[taskName];
+
+    if(!_task){
+      throw new Error('task not found');
+    }
+
+    data = _task.fn.call(_task.service);
+
+    return (Object.keys(data).length > 0) ? { data : data } : null;
+  }
 }
 
 
