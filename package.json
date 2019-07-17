@@ -1,19 +1,40 @@
 {
   "name": "symmetry-js",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "JavaScript Framework",
   "main": "dist/bundle.js",
   "peerDependencies": {
     "webpack": "^4.28.1",
     "webpack-cli": "^3.2.1"
   },
+  "dependencies": {
+    "@babel/plugin-transform-regenerator": "^7.4.3",
+    "@babel/plugin-transform-runtime": "^7.4.3",
+    "@babel/polyfill": "^7.4.3",
+    "@babel/runtime": "^7.4.3",
+    "babel-core": "^6.26.3",
+    "babel-register": "^6.26.0",
+    "classlist-polyfill": "^1.2.0",
+    "match-media": "^0.2.0",
+    "node-fetch": "^2.2.0",
+    "nodelist-foreach-polyfill": "^1.2.0",
+    "regenerator-runtime": "^0.13.2"
+  },
   "devDependencies": {
+    "@babel/preset-env": "^7.5.4",
+    "babel-core": "^6.26.3",
+    "babel-jest": "^24.8.0",
+    "babel-loader": "^8.0.5",
+    "env-cmd": "^8.0.2",
+    "jest": "^24.5.0",
+    "promise-polyfill": "^8.1.0",
     "webpack": "^4.28.1",
     "webpack-cli": "^3.2.1"
   },
   "scripts": {
     "build": "webpack --mode production",
-    "prepublish": "rm -rf ./dist && npm run build"
+    "prepublish": "rm -rf ./dist && npm run build",
+    "test": "env-cmd ./.env_test jest"
   },
   "repository": {
     "type": "git",
