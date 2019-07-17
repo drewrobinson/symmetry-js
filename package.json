@@ -1,14 +1,20 @@
 {
   "name": "symmetry-js",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "JavaScript Framework",
   "author": "Drew Robinson <hello@drewrobinson.com>",
   "license": "ISC",
   "homepage": "https://symmetry-js.herokuapp.com/",
+  "main": "dist/bundle.js",
+  "engines": {
+    "node": "v12.6.0"
+  },
   "bugs": {
     "url": "https://github.com/drewrobinson/symmetry-js/issues"
   },
-  "main": "dist/bundle.js",
+  "directories": {
+    "src": "src"
+  },
   "keywords": [
     "JavaScript",
     "Framework"
@@ -21,9 +27,6 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/drewrobinson/symmetry-js.git"
-  },
-  "directories": {
-    "src": "src"
   },
   "peerDependencies": {
     "webpack": "^4.28.1",
