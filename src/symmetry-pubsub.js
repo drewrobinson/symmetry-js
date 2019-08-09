@@ -27,19 +27,19 @@ class PubSub {
             self.logger(`Register Message Notification: ${msg} has already been registered with ${self.id}`);
         }
     }
-    
+
     /**
      * Responsible for unregistering message with message bus
      */
     unregisterMessage(msg) {
-      let self = this;
-      
-      if (typeof msg !== "string") {
-        throw new TypeError(`Unregister Message Error: Message argument should be of type string`);
-      }
-      
-      delete self.messages[msg];
-      delete self.listeners[msg];
+        let self = this;
+
+        if (typeof msg !== "string") {
+            throw new TypeError(`Unregister Message Error: Message argument should be of type string`);
+        }
+
+        delete self.messages[msg];
+        delete self.listeners[msg];
     }
 
     /**
@@ -51,8 +51,8 @@ class PubSub {
     subscribe(msg, listener, context) {
 
         let self = this;
-        
-        
+
+
         if (!self.messages.hasOwnProperty(msg) || !Object.keys(self.listeners).includes(msg)) {
             throw new ReferenceError(`Subscribe Error: Attempting to subscribe to message: ${msg} before it was registered with ${self.id} `);
         }
@@ -61,8 +61,8 @@ class PubSub {
         if (typeof listener !== "function") {
             throw new TypeError(`Subscribe Error: listener argument should be of type function`);
         }
-         
-        
+
+
         if (listener.name.length < 1 || typeof listener.name === 'undefined') {
             throw new ReferenceError(`Subscribe Error: listener must be named function`);
         }
@@ -104,7 +104,7 @@ class PubSub {
         }
 
         let i = 0,
-            l = self.listeners[msg].length;
+          l = self.listeners[msg].length;
 
         for (i; i < l; i++) {
             if (self.listeners[msg][i].listener.name === listener.name && self.listeners[msg][i].context === context) {
@@ -139,17 +139,17 @@ class PubSub {
         let i = self.listeners[msg].length;
 
         while (i--) {
-            
+
             self.listeners[msg][i].listener.call(self.listeners[msg][i].context, {
                 msg: msg,
                 data: data
             });
         }
-        
+
     }
 
 } //-->
 
 export {
-    PubSub
+  PubSub
 }

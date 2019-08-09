@@ -5,15 +5,15 @@ function Logger(){
     if(typeof message !== "string" && message.length < 1){
       return
     }
-   
+
     if(window && window.hasOwnProperty('DEBUG_SYMMETRY') && window.DEBUG_SYMMETRY){
       console.warn(message);
     }
-   
+
     if(process && process.env.hasOwnProperty('DEBUG_SYMMETRY') && process.env.DEBUG_SYMMETRY.toLowerCase() === 'true'){
       console.warn(message);
     }
-    
+
   };
 }
 

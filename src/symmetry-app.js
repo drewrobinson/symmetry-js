@@ -2,15 +2,15 @@
 const ROOT_SELECTOR = 'data-symmetry-js-app';
 
 class App {
-  
+
   constructor(componentList, debug=false) {
     let self = this;
-    
+
     self.initialized = false;
     self.componentList = componentList;
     self.observer = new MutationObserver(self.mutationHandler.bind(self));
     self.initialize();
-    
+
     if(window){
       window.DEBUG_SYMMETRY = debug;
     }
@@ -55,7 +55,7 @@ class App {
         throw new Error(`${component.name} missing selector`);
       }
       var componentReferences = _scope.querySelectorAll(`[data-symmetry-js-${_selector}]`);
-     
+
       if(componentReferences.length > 0){
         [...componentReferences].forEach(element => new component(element));
       }

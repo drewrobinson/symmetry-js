@@ -7,18 +7,16 @@ class Component {
     let self = this;
     self.bus = Symmetry.Mediator.constructor.getComponentBus();
     self.logger = logger;
-    
+
     self.symmetryId = hashKey();
-    //console.log('*** self.symmetryId: ', self.symmetryId);
-    //console.log('self', self);
-    
+
     if(self.constructor.messages){
       let messages = self.constructor.messages();
       messages.forEach((msg)=>{
         if(typeof msg !== 'string'){
           throw new TypeError(`Service constructor msg argument should be of type string`);
         }
-        
+
         self.bus.registerMessage(msg);
       });
     }

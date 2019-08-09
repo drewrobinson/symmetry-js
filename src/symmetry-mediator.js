@@ -7,7 +7,7 @@ let serviceBus;
 const MODEL_ERROR = 'MODEL_ERROR';
 
 class Mediator {
-  
+
   static getModelErrorMessage(){
     return MODEL_ERROR;
   }
@@ -36,19 +36,19 @@ class Mediator {
     this.queueConcurrency = queueConcurrency;
     this.tasksProcessing = 0;
     this.logger = logger;
-    
+
     //Create Bus Instances
     componentBus = new PubSub('componentBus');
     serviceBus = new PubSub('serviceBus');
-    
+
     //Register Error Notification Messages
     componentBus.registerMessage(MODEL_ERROR);
     serviceBus.registerMessage(MODEL_ERROR);
-    
+
     //Register Error Listener with Service Bus
     serviceBus.subscribe(MODEL_ERROR, self.errorListener, self);
   }
-  
+
   /**
    * Responsible for overriding default queueConcurrency
    * @param {int} queueConcurrency
@@ -58,12 +58,13 @@ class Mediator {
       this.queueConcurrency = queueConcurrency;
     }
   }
-  
+
   /**
    * Responsible for re-publishing model error message to component bus
    */
-  errorListener(msg){    
-    componentBus.publish(msg.msg, msg);
+  errorListener(msg){
+    let _msg = (msg.hasOwnProperty("data")) ? msg.data : msg;
+    componentBus.publish(msg.msg, _msg);
   }
 
   /**
@@ -72,20 +73,20 @@ class Mediator {
    */
   registerService(service){
     let self = this;
-    
+
     if(!service instanceof Object){
       throw new TypeError(`Mediator Register Error: argument cannot be instantiated`);
     }
-    
+
     let _aux = new service();
-    
+
     //Register Service Model Updated Message
-    componentBus.registerMessage(_aux.model.MODEL_UPDATED); 
+    componentBus.registerMessage(_aux.model.MODEL_UPDATED);
     serviceBus.registerMessage(_aux.model.MODEL_UPDATED);
-    
+
     Object.getOwnPropertyNames(service.prototype).forEach((prop)=>{
       if(prop !== 'constructor'){
-       
+
         if(!self.taskMap.hasOwnProperty(prop)){
           self.taskMap[prop] = {
             name: prop,
@@ -98,45 +99,45 @@ class Mediator {
           throw new TypeError(`Name Conflict: Another service has already registerd a method named ${prop}.`);
         }
       }
-      
+
     });
   }
-  
+
   /**
    * Responsible for unregistering a service with the mediator
    */
   unregisterService(service){
     let self = this;
-    
+
     if(!service instanceof Object){
       throw new TypeError(`Mediator Unregister Error: missing required argument`);
     }
-    
+
     let _aux = new service();
-   
+
     Object.getOwnPropertyNames(service.prototype).forEach((prop)=>{
       if(prop !== 'constructor'){
-        
+
         //clean up taskMap
         if(self.taskMap.hasOwnProperty(prop)){
           delete self.taskMap[prop];
         }
-        
+
         //clean up processingMap 
         if(self.processingMap.hasOwnProperty(prop)){
           delete self.processingMap[prop];
         }
-        
+
         //clean up component and service bus
-        componentBus.unregisterMessage(_aux.model.MODEL_UPDATED); 
+        componentBus.unregisterMessage(_aux.model.MODEL_UPDATED);
         serviceBus.unregisterMessage(_aux.model.MODEL_UPDATED);
-        
+
       }
     });
-    
+
     _aux = null;
   }
-    
+
   /**
    * Responsible for registering task with taskQueue
    * @param {string} taskName
@@ -144,64 +145,64 @@ class Mediator {
    * @TODO: Accommodate multiple requests to queue same task with different parameters
    */
   queueTask(taskName, params){
-    
+
     let self = this;
     let paramSignature = '';
     let taskSignature = taskName;
-    
+
     if(typeof taskName !== "string"){
       throw new TypeError(`Mediator queueTask Error: taskName argument is not of type string`);
     }
-       
+
     if(!self.taskMap.hasOwnProperty(taskName)){
       throw new ReferenceError(`Mediator queueTask Error: ${taskName} is not a registered service method`);
     }
-    
-    
+
+
     if(params && typeof params === "object" && params.hasOwnProperty('task-signature')){
       taskSignature = params['task-signature'];
     }
-    
-    
- 
+
+
+
     if(self.processingMap[taskSignature] > 0){
       self.logger(`${taskName} task is already processing in queue and request will be disregarded`);
       return 'disregarded';
     }
-    
+
     self.processingMap[taskSignature] = 1;
-        
+
     let listener = function(){
-      
+
       return {
-        queueTaskCallback: function queueTaskCallback(msg){ 
+        queueTaskCallback: function queueTaskCallback(msg){
 
           componentBus.publish(componentBus.messages[task.message], msg.data);
-          
+
           Object.assign(task, {listener : this });
         }
       }
     }
-    
-    
-    let task = {  
-        name: taskSignature, 
-        message: self.taskMap[taskName].message, 
-        fn: self.taskMap[taskName].fn, 
-        ctx: self.taskMap[taskName].service, 
-        params: params || {} 
+
+
+    let task = {
+      name: taskSignature,
+      message: self.taskMap[taskName].message,
+      fn: self.taskMap[taskName].fn,
+      ctx: self.taskMap[taskName].service,
+      params: params || {}
     };
-    
+
     let listenerInstance = new listener();
-  
+
     serviceBus.subscribe(serviceBus.messages[self.taskMap[taskName].message], listenerInstance.queueTaskCallback, listenerInstance);
-    
+
     self.taskQueue.push(task);
 
     if (self.taskQueue.length > 0) {
       self.processTaskQueue();
     }
-    
+
   }
 
 
@@ -226,22 +227,22 @@ class Mediator {
    * @param name
    */
   dequeueTask(task) {
-   
+
     let self = this;
-    
+
     self.processingMap[task.name] = 0;
     self.tasksProcessing -= 1;
-    
+
     if(task.hasOwnProperty('listener')){
       serviceBus.unsubscribe(task.message, task.listener.queueTaskCallback, task.listener);
     }
-    
+
     if (self.taskQueue.length > 0) {
       self.processTaskQueue();
     }
   }
-  
-  
+
+
   /**
    * @NOTE - NOT DEV COMPLETE DO NOT USE
    * Responsible for adding task queue and resolving promise when complete
@@ -249,11 +250,11 @@ class Mediator {
    * @param {String} taskName
    * @returns {Promise}
    */
-  
+
   resolveTask(taskName, params, resolveProp) {
 
     let self = this;
-    
+
     if(!self.taskMap.hasOwnProperty(taskName)){
       throw new ReferenceError(`Mediator resolveTask Error: ${taskName} is not a registered service method`);
     }
@@ -261,17 +262,17 @@ class Mediator {
     if(typeof resolveProp !== "string" || resolveProp.length < 1){
       throw new ReferenceError(`Mediator resolveTask Error: ${taskName} is missing required argument`);
     }
-    
-  
-    let promise = new Promise(function resolveTaskPromise(resolve, reject) { 
-      
+
+
+    let promise = new Promise(function resolveTaskPromise(resolve, reject) {
+
       let listener = function(task, componentBus, serviceBus,resolve, reject, resolveProp){
-        
+
         return {
-          resolverCallback: function resolverCallback(msg){             
+          resolverCallback: function resolverCallback(msg){
             if(msg.data.hasOwnProperty(resolveProp)){
               serviceBus.unsubscribe(serviceBus.messages[task.message], this.resolverCallback, this);
-              
+
               if(msg){
                 resolve(msg.data[resolveProp]);
               }else{
@@ -281,23 +282,23 @@ class Mediator {
           }
         }
       }
-      
+
       let listenerInstance = new listener(self.taskMap[taskName], componentBus, serviceBus, resolve, reject, resolveProp);
-      
+
       serviceBus.subscribe(self.taskMap[taskName].message, listenerInstance.resolverCallback, listenerInstance);
-      
+
       self.queueTask(taskName, params);
     });
-    
+
     promise.catch(function(error) {
       self.logger('There was an error with resolveTask promise ::', error);
     });
-    
+
     return promise;
   }
-  
-  
+
+
 }
-  
-  
+
+
 export { Mediator };
