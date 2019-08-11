@@ -5,7 +5,7 @@ class App {
 
   constructor(componentList, debug=false, observeSubTree=false) {
     let self = this;
-
+    self.observeSubTree = observeSubTree;
     self.initialized = false;
     self.componentList = componentList;
     self.observer = new MutationObserver(self.mutationHandler.bind(self));
@@ -63,7 +63,7 @@ class App {
 
     if(!self.initialized){
       let targetNode = document.querySelector(`[${ROOT_SELECTOR}]`);
-      let config = { attributes: false, childList: true, subtree: observeSubTree };
+      let config = { attributes: false, childList: true, subtree: self.observeSubTree };
       self.initialized = true;
       self.observer.observe(targetNode, config);
     }
