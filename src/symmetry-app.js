@@ -3,7 +3,7 @@ const ROOT_SELECTOR = 'data-symmetry-js-app';
 
 class App {
 
-  constructor(componentList, debug=false) {
+  constructor(componentList, debug=false, observeSubTree=false) {
     let self = this;
 
     self.initialized = false;
@@ -63,7 +63,7 @@ class App {
 
     if(!self.initialized){
       let targetNode = document.querySelector(`[${ROOT_SELECTOR}]`);
-      let config = { attributes: false, childList: true, subtree: false };
+      let config = { attributes: false, childList: true, subtree: observeSubTree };
       self.initialized = true;
       self.observer.observe(targetNode, config);
     }
