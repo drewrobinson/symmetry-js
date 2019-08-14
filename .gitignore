@@ -1,7 +1,6 @@
 #local
 demo
 server.js
-webpack.config.js
 .eslintrc
 node_modules
 .babelrc
@@ -10,8 +9,6 @@ node_modules
 .env_heroku
 cors.js
 Procfile
-bak-package.json
-bak-webpack.config.js
 dist/
 
 # Logs
