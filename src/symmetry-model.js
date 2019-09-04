@@ -107,7 +107,6 @@ class Model {
         .catch(function(error) {
           self.error({type:'GET Error', error: error});
           self.logger("GET Error: " + error);
-          throw 'error';
         });
 
     });
@@ -116,7 +115,6 @@ class Model {
       let error = (Object.keys(errorObj).length > 0) ? errorObj : {error: errorObj.toString()};
       self.error(errorObj);
       self.logger('GET Promise Rejected. ' + JSON.stringify(error));
-      throw 'error';
     })
 
     return _promise;
@@ -171,7 +169,6 @@ class Model {
         .catch(function(error) {
           self.error({type:'POST Error', error: error});
           self.logger("POST Error: " + error);
-          throw 'error';
         });
     });
 
@@ -179,7 +176,6 @@ class Model {
       let error = (Object.keys(errorObj).length > 0) ? errorObj : {error: errorObj.toString()};
       self.error(errorObj);
       self.logger('POST Promise Rejected. ' + JSON.stringify(error));
-      throw 'error';
     })
 
     return _promise;
@@ -234,7 +230,6 @@ class Model {
         .catch(function(error) {
           self.error({type:'PUT Error', error: error});
           self.logger("PUT Error: " + error);
-          throw 'error';
         });
     });
 
@@ -242,7 +237,6 @@ class Model {
       let error = (Object.keys(errorObj).length > 0) ? errorObj : {error: errorObj.toString()};
       self.error(errorObj);
       self.logger('PUT Promise Rejected. ' + JSON.stringify(error));
-      throw 'error';
     })
 
     return _promise;
