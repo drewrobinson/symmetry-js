@@ -3,15 +3,12 @@ import { logger } from "./symmetry-utils";
 /**
  *
  * Represents Service Model
- *
- * @author Drew Robinson <drobinso@adobe.com>
+ * @author Drew Robinson
  */
 
 class Model {
-
   constructor(service, updateMsg, errorMsg) {
     let self = this;
-
     self.service = service;
     self.data = {};
     self.MODEL_UPDATED = updateMsg;
@@ -20,7 +17,32 @@ class Model {
   }
 
   /**
+   * getData
+   * @returns {*}
+   */
+  getData() {
+    return this.data;
+  }
+
+  /**
+   * setData
+   */
+  setData(data) {
+    let self = this;
+
+    if (!data) {
+      throw new Error("Cannot set data");
+    }
+
+    let aux = Object.assign({}, data);
+    self.data = null;
+    self.data = Object.freeze(aux);
+    self.service.bus.publish(self.MODEL_UPDATED, self.data);
+  }
+
+  /**
    * Responsible for publishing error message on service bus
+   * @param errorObj
    */
   error(errorObj){
     let self = this;
@@ -32,10 +54,8 @@ class Model {
    * @param contentType {string}
    * @param response {}
    */
-  getResponseBody(contentType, response){
-
+  readResponseBody(contentType, response){
     let _contentType = contentType || "";
-
     let responseBody;
 
     if(_contentType.indexOf('json') > -1){
@@ -57,6 +77,34 @@ class Model {
     return responseBody;
   }
 
+  /**
+   * Responsible for returning boolean indicator to resolve or reject based on status code
+   * @param status
+   * @returns {boolean}
+   */
+  responseHandler(status){
+    let resolve = true;
+    //Error
+    if(status >= 400){
+      resolve = false;
+    }
+
+    //Redirect
+    if (status >= 300) {
+      resolve = true;
+    }
+
+    //Success
+    if (status > 200) {
+      resolve = true;
+    }
+
+    if(status === 200) {
+      resolve = true
+    }
+    return resolve;
+  }
+
 
   /**
    *
@@ -65,50 +113,30 @@ class Model {
    * @private
    */
   get(headers, url) {
-
     let self = this;
-
     let _promise = new Promise((resolve, reject) => {
-
       fetch(url, {
         method: "GET",
         cache: "no-cache",
         headers: headers,
         credentials: "same-origin"
       })
-        .then(function(response) {
-
-          const contentType = response.headers.get("content-type");
-
-          //Error
-          if(response.status >= 400){
-            let aux = response.clone();
-            reject({type:'GET Error', code:response.status, url:url, aux: aux});
-            return;
-          }
-
-          //Redirect
-          if (response.status >= 300) {
-            resolve(self.getResponseBody(contentType, response));
-            return;
-          }
-
-          //Success
-          if (response.status > 200) {
-            resolve(self.getResponseBody(contentType, response));
-            return;
-          }
-
-          if(response.status === 200) {
-            resolve(self.getResponseBody(contentType, response));
-            return;
-          }
-        })
-        .catch(function(error) {
-          self.error({type:'GET Error', error: error});
-          self.logger("GET Error: " + error);
-        });
-
+      .then(function(response) {
+        const contentType = response.headers.get("content-type");
+        const shouldResolve = self.responseHandler(response.status);
+        if(shouldResolve){
+          resolve(self.readResponseBody(contentType, response));
+          return;
+        }else{
+          let aux = response.clone();
+          reject({type:'GET Error', code:response.status, url:url, aux: aux});
+          return;
+        }
+      })
+      .catch(function(error) {
+        self.error({type:'GET Error', error: error});
+        self.logger("GET Error: " + error);
+      });
     });
 
     _promise.catch(function(errorObj){
@@ -116,7 +144,6 @@ class Model {
       self.error(errorObj);
       self.logger('GET Promise Rejected. ' + JSON.stringify(error));
     })
-
     return _promise;
   }
 
@@ -128,9 +155,7 @@ class Model {
    * @private
    */
   post(headers, url, opts) {
-
     let self = this;
-
     let _promise = new Promise((resolve, reject) => {
       fetch(url, {
         method: "POST",
@@ -138,45 +163,29 @@ class Model {
         cache: "no-cache",
         headers: headers
       })
-        .then(function(response) {
-
-          const contentType = response.headers.get("content-type");
-
-          //Error
-          if(response.status >= 400){
-            let aux = response.clone();
-            reject({type:'POST Error', code:response.status, url:url, aux: aux});
-            return;
-          }
-
-          //Redirect
-          if (response.status >= 300) {
-            resolve(self.getResponseBody(contentType, response));
-            return;
-          }
-
-          //Success
-          if (response.status > 200) {
-            resolve(self.getResponseBody(contentType, response));
-            return;
-          }
-
-          if(response.status === 200) {
-            resolve(self.getResponseBody(contentType, response));
-            return;
-          }
-        })
-        .catch(function(error) {
-          self.error({type:'POST Error', error: error});
-          self.logger("POST Error: " + error);
-        });
+      .then(function(response) {
+        const contentType = response.headers.get("content-type");
+        const shouldResolve = self.responseHandler(response.status);
+        if(shouldResolve){
+          resolve(self.readResponseBody(contentType, response));
+          return;
+        }else{
+          let aux = response.clone();
+          reject({type:'GET Error', code:response.status, url:url, aux: aux});
+          return;
+        }
+      })
+      .catch(function(error) {
+        self.error({type:'POST Error', error: error});
+        self.logger("POST Error: " + error);
+      });
     });
 
     _promise.catch(function(errorObj){
       let error = (Object.keys(errorObj).length > 0) ? errorObj : {error: errorObj.toString()};
       self.error(errorObj);
       self.logger('POST Promise Rejected. ' + JSON.stringify(error));
-    })
+    });
 
     return _promise;
   }
@@ -189,9 +198,7 @@ class Model {
    * @private
    */
   put(headers, url, opts) {
-
     let self = this;
-
     let _promise = new Promise((resolve, reject) => {
       fetch(url, {
         method: "PUT",
@@ -199,46 +206,29 @@ class Model {
         cache: "no-cache",
         headers: headers
       })
-        .then(function(response) {
-
-          const contentType = response.headers.get("content-type");
-
-          //Error
-          if(response.status >= 400){
-            let aux = response.clone();
-            reject({type:'PUT Error', code:response.status, url:url, aux: aux});
-            return;
-          }
-
-          //Redirect
-          if (response.status >= 300) {
-            resolve(self.getResponseBody(contentType, response));
-            return;
-          }
-
-          //Success
-          if (response.status > 200) {
-            resolve(self.getResponseBody(contentType, response));
-            return;
-          }
-
-          if(response.status === 200) {
-            resolve(self.getResponseBody(contentType, response));
-            return;
-          }
-        })
-        .catch(function(error) {
-          self.error({type:'PUT Error', error: error});
-          self.logger("PUT Error: " + error);
-        });
+      .then(function(response) {
+        const contentType = response.headers.get("content-type");
+        const shouldResolve = self.responseHandler(response.status);
+        if(shouldResolve){
+          resolve(self.readResponseBody(contentType, response));
+          return;
+        }else{
+          let aux = response.clone();
+          reject({type:'GET Error', code:response.status, url:url, aux: aux});
+          return;
+        }
+      })
+      .catch(function(error) {
+        self.error({type:'PUT Error', error: error});
+        self.logger("PUT Error: " + error);
+      });
     });
 
     _promise.catch(function(errorObj){
       let error = (Object.keys(errorObj).length > 0) ? errorObj : {error: errorObj.toString()};
       self.error(errorObj);
       self.logger('PUT Promise Rejected. ' + JSON.stringify(error));
-    })
-
+    });
     return _promise;
   }
 
@@ -250,9 +240,7 @@ class Model {
    * @returns {Promise}
    */
   delete(headers, url, opts) {
-
     let self = this;
-
     let _promise = new Promise((resolve, reject) => {
       fetch(url, {
         method: "DELETE",
@@ -260,74 +248,30 @@ class Model {
         cache: "no-cache",
         headers: headers
       })
-        .then(function(response) {
-
-          const contentType = response.headers.get("content-type");
-
-          //Error
-          if(response.status >= 400){
-            let aux = response.clone();
-            reject({type:'DELETE Error', code:response.status, url:url, aux: aux});
-            return;
-          }
-
-          //Redirect
-          if (response.status >= 300) {
-            resolve(self.getResponseBody(contentType, response));
-            return;
-          }
-
-          //Success
-          if (response.status > 200) {
-            resolve(self.getResponseBody(contentType, response));
-            return;
-          }
-
-          if(response.status === 200) {
-            resolve(self.getResponseBody(contentType, response));
-            return;
-          }
-        })
-        .catch(function(error) {
-          self.error({type:'DELETE Error', error: error});
-          self.logger("DELETE Error: " + error);
-        });
+      .then(function(response) {
+        const contentType = response.headers.get("content-type");
+        const shouldResolve = self.responseHandler(response.status);
+        if(shouldResolve){
+          resolve(self.readResponseBody(contentType, response));
+          return;
+        }else{
+          let aux = response.clone();
+          reject({type:'GET Error', code:response.status, url:url, aux: aux});
+          return;
+        }
+      })
+      .catch(function(error) {
+        self.error({type:'DELETE Error', error: error});
+        self.logger("DELETE Error: " + error);
+      });
     });
 
     _promise.catch(function(errorObj){
       let error = (Object.keys(errorObj).length > 0) ? errorObj : {error: errorObj.toString()};
       self.error(errorObj);
       self.logger('DELETE Promise Rejected. ' + JSON.stringify(error));
-    })
-
+    });
     return _promise;
-  }
-
-  /**
-   *
-   * getData
-   *
-   */
-  getData() {
-    return this.data;
-  }
-
-  /**
-   *
-   * setData
-   *
-   */
-  setData(data) {
-    let self = this;
-
-    if (!data) {
-      throw new Error("Cannot set data");
-    }
-
-    let aux = Object.assign({}, data);
-    self.data = null;
-    self.data = Object.freeze(aux);
-    self.service.bus.publish(self.MODEL_UPDATED, self.data);
   }
 }
 

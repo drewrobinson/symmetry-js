@@ -1,7 +1,6 @@
 const ROOT_SELECTOR = 'data-symmetry-js-app';
 
 class App {
-
   constructor(componentList, debug=false) {
     let self = this;
     self.initialized = false;
@@ -34,9 +33,9 @@ class App {
   }
 
   /**
-   * Responsible for searching given scope (DOM SubTree) for component references that can be initialized and initializing them.
-   * document element is used as default scope if one is not provided
-   * e.g. components that do not have symmetry-js-* dataset value equal to "viewed"
+   * Responsible for searching given scope (DOM SubTree) for component references to be initialized.
+   *    - e.g. components that do not have symmetry-js-* dataset value equal to "viewed"
+   * @desc - document element is used as default scope if one is not provided
    * @param scope - a dom element; default is documentElement
    */
   initialize(scope) {
@@ -46,7 +45,7 @@ class App {
     //Only connect observer on first initalization call
     if(!self.initialized){
       let targetNode = document.querySelector(`[${ROOT_SELECTOR}]`);
-      var config = {
+      let config = {
         childList: true,
         subtree: true
       };

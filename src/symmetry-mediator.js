@@ -1,13 +1,17 @@
 import { logger } from "./symmetry-utils";
 import { PubSub } from "./symmetry-pubsub";
 
+const MODEL_ERROR = 'MODEL_ERROR';
+
 let componentBus;
 let serviceBus;
 
-const MODEL_ERROR = 'MODEL_ERROR';
-
 class Mediator {
 
+  /**
+   * Responsible for getting
+   * @returns {string}
+   */
   static getModelErrorMessage(){
     return MODEL_ERROR;
   }
@@ -51,7 +55,7 @@ class Mediator {
 
   /**
    * Responsible for overriding default queueConcurrency
-   * @param {int} queueConcurrency
+   * @param {number} queueConcurrency
    */
   setConcurrency(queueConcurrency){
     if(typeof queueConcurrency === 'number' & queueConcurrency > 0){
@@ -61,6 +65,7 @@ class Mediator {
 
   /**
    * Responsible for re-publishing model error message to component bus
+   * @param msg
    */
   errorListener(msg){
     let _msg = (msg.hasOwnProperty("data")) ? msg.data : msg;
@@ -99,7 +104,6 @@ class Mediator {
           throw new TypeError(`Name Conflict: Another service has already registerd a method named ${prop}.`);
         }
       }
-
     });
   }
 
@@ -131,10 +135,8 @@ class Mediator {
         //clean up component and service bus
         componentBus.unregisterMessage(_aux.model.MODEL_UPDATED);
         serviceBus.unregisterMessage(_aux.model.MODEL_UPDATED);
-
       }
     });
-
     _aux = null;
   }
 
@@ -145,7 +147,6 @@ class Mediator {
    * @TODO: Accommodate multiple requests to queue same task with different parameters
    */
   queueTask(taskName, params){
-
     let self = this;
     let paramSignature = '';
     let taskSignature = taskName;
@@ -158,12 +159,9 @@ class Mediator {
       throw new ReferenceError(`Mediator queueTask Error: ${taskName} is not a registered service method`);
     }
 
-
     if(params && typeof params === "object" && params.hasOwnProperty('task-signature')){
       taskSignature = params['task-signature'];
     }
-
-
 
     if(self.processingMap[taskSignature] > 0){
       self.logger(`${taskName} task is already processing in queue and request will be disregarded`);
@@ -173,17 +171,13 @@ class Mediator {
     self.processingMap[taskSignature] = 1;
 
     let listener = function(){
-
       return {
         queueTaskCallback: function queueTaskCallback(msg){
-
           componentBus.publish(componentBus.messages[task.message], msg.data);
-
           Object.assign(task, {listener : this });
         }
       }
-    }
-
+    };
 
     let task = {
       name: taskSignature,
@@ -202,10 +196,7 @@ class Mediator {
     if (self.taskQueue.length > 0) {
       self.processTaskQueue();
     }
-
   }
-
-
 
   /**
    * Responsible for processing task queue
@@ -221,15 +212,12 @@ class Mediator {
     }
   }
 
-
   /**
    * Responsible for removing task from queue
    * @param name
    */
   dequeueTask(task) {
-
     let self = this;
-
     self.processingMap[task.name] = 0;
     self.tasksProcessing -= 1;
 
@@ -242,17 +230,15 @@ class Mediator {
     }
   }
 
-
   /**
-   * @NOTE - NOT DEV COMPLETE DO NOT USE
    * Responsible for adding task queue and resolving promise when complete
    * @desc - Wraps Symmetry.Mediator.queueTask method in promise
-   * @param {String} taskName
+   * @param taskName
+   * @param params
+   * @param resolveProp
    * @returns {Promise}
    */
-
   resolveTask(taskName, params, resolveProp) {
-
     let self = this;
 
     if(!self.taskMap.hasOwnProperty(taskName)){
@@ -263,11 +249,8 @@ class Mediator {
       throw new ReferenceError(`Mediator resolveTask Error: ${taskName} is missing required argument`);
     }
 
-
     let promise = new Promise(function resolveTaskPromise(resolve, reject) {
-
       let listener = function(task, componentBus, serviceBus,resolve, reject, resolveProp){
-
         return {
           resolverCallback: function resolverCallback(msg){
             if(msg.data.hasOwnProperty(resolveProp)){
@@ -281,12 +264,10 @@ class Mediator {
             }
           }
         }
-      }
+      };
 
       let listenerInstance = new listener(self.taskMap[taskName], componentBus, serviceBus, resolve, reject, resolveProp);
-
       serviceBus.subscribe(self.taskMap[taskName].message, listenerInstance.resolverCallback, listenerInstance);
-
       self.queueTask(taskName, params);
     });
 
@@ -296,8 +277,6 @@ class Mediator {
 
     return promise;
   }
-
-
 }
 
 

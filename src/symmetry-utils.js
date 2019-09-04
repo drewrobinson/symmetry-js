@@ -1,7 +1,10 @@
+/**
+ * Responsible for logging messages to console
+ * @returns {Logger}
+ * @constructor
+ */
 function Logger(){
-
   return function Logger(message){
-
     if(typeof message !== "string" && message.length < 1){
       return
     }
@@ -13,11 +16,14 @@ function Logger(){
     if(process && process.env.hasOwnProperty('DEBUG_SYMMETRY') && process.env.DEBUG_SYMMETRY.toLowerCase() === 'true'){
       console.warn(message);
     }
-
   };
 }
 
-
+/**
+ * Responsible for generating random hash string
+ * @returns {Hash}
+ * @constructor
+ */
 function Hash() {
   return function Hash(){
     var S4 = function () {
@@ -26,7 +32,6 @@ function Hash() {
     return (S4() + S4() + S4() + S4());
   };
 }
-
 
 const logger = new Logger();
 const hashKey = new Hash();

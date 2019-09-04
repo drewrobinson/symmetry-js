@@ -3,7 +3,6 @@ import { Symmetry } from "./symmetry";
 import { Model } from "./symmetry-model";
 
 class Service {
-
   constructor(modelUpdatedMessage) {
     let self = this;
 
@@ -16,6 +15,5 @@ class Service {
     self.model = new Model(self, modelUpdatedMessage, Symmetry.Mediator.constructor.getModelErrorMessage());
   }
 }
-
 
 export { Service };
