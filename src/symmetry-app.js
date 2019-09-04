@@ -1,4 +1,3 @@
-
 const ROOT_SELECTOR = 'data-symmetry-js-app';
 
 class App {

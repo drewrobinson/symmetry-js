@@ -1,4 +1,3 @@
-import { logger } from "./symmetry-utils";
 import { App } from "./symmetry-app";
 import { PubSub } from "./symmetry-pubsub";
 import { Component } from "./symmetry-component";
