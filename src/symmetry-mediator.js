@@ -27,7 +27,7 @@ let serviceBus;
 class Mediator {
 
   /**
-   * Responsible for getting
+   * Responsible for returning model error message
    * @returns {string}
    */
   static getModelErrorMessage(){
