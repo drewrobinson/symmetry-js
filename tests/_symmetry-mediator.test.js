@@ -1,5 +1,22 @@
-import { Symmetry } from "../src/symmetry";
+/**
+ * ISC License (ISC)
+ *
+ * Copyright 2019 DrewRobinson <hello@drewrobinson.com>
+ *
+ * Permission to use, copy, modify, and/or distribute this software
+ * for any purpose with or without fee is hereby granted, provided
+ * that the above copyright notice and this permission notice appear
+ * in all copies.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES
+ * WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY
+ * AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
+ * INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS
+ * OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER
+ * TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
+ */
 
+import { Symmetry } from "../src/symmetry";
 
 describe('Mediator Class', () => {
 
@@ -45,17 +62,7 @@ describe('Mediator Class', () => {
 });//-->
 
 describe('Mediator.registerService', () => {
-  
-  beforeEach(() => {
-    //console.log('---- Before Each : registerService > Symmetry.Mediator.processingMap',Symmetry.Mediator.processingMap)
-  });
 
-  
-
-  afterEach(() => {
-    //console.log('---- After Each : registerService > Symmetry.Mediator.processingMap',Symmetry.Mediator.processingMap)
-  });
-  
   test('Mediator.registerService should throw TypeError if argument cannot be instantiated', () => {
     
     class MockService extends Symmetry.Service {
@@ -159,22 +166,8 @@ describe('Mediator.registerService', () => {
   
 });//-->
 
-
-
 describe('Mediator.queueTask', () => {
-  
-  beforeEach(() => {
-    //console.log('---- Before Each : queueTask > Symmetry.Mediator.processingMap',Symmetry.Mediator.processingMap)
-    //console.log('---- Before Each : queueTask > Symmetry.Mediator.taskMap',Symmetry.Mediator.taskMap)
-  });
 
-  
-
-  afterEach(() => {
-    //console.log('---- After Each : queueTask > Symmetry.Mediator.processingMap',Symmetry.Mediator.processingMap)
-    //console.log('---- After Each : queueTask > Symmetry.Mediator.taskMap',Symmetry.Mediator.taskMap)
-  });
- 
   test('Mediator.queueTask taskName argument should be registered in taskMap', () => {
     
     let badTask = 'nonRegisteredTaskName';
@@ -251,19 +244,6 @@ describe('Mediator.queueTask', () => {
 
 
 describe('Mediator.dequeueTask', () => {
-
-  beforeEach(() => {
-    //console.log('---- Before Each : queueTask > Symmetry.Mediator.processingMap',Symmetry.Mediator.processingMap)
-    //console.log('---- Before Each : queueTask > Symmetry.Mediator.taskMap',Symmetry.Mediator.taskMap)
-  });
-
-  
-
-  afterEach(() => {
-   // console.log('---- After Each : queueTask > Symmetry.Mediator.processingMap',Symmetry.Mediator.processingMap)
-    //console.log('---- After Each : queueTask > Symmetry.Mediator.taskMap',Symmetry.Mediator.taskMap)
-  });
-  
   test('Mediator.dequeueTask should assign task name as key in processingMap to value of 0', done => {
     
     let taskName = 'mockServiceMethod';
@@ -288,9 +268,6 @@ describe('Mediator.dequeueTask', () => {
     Symmetry.Mediator.registerService(MockService);
     
     Symmetry.Mediator.queueTask(taskName);
-    
-    
-    
   });
   
   
@@ -328,29 +305,11 @@ describe('Mediator.dequeueTask', () => {
       Symmetry.Mediator.registerService(MockService);
       
       Symmetry.Mediator.queueTask(taskName);
-     
-      
     });
- 
-
-  
 });//-->
 
 
 describe('Mediator.resolveTask', () => {
-  
-  beforeEach(() => {
-   // console.log('---- Before Each : queueTask > Symmetry.Mediator.processingMap',Symmetry.Mediator.processingMap)
-   // console.log('---- Before Each : queueTask > Symmetry.Mediator.taskMap',Symmetry.Mediator.taskMap)
-  });
-
-  
-
-  afterEach(() => {
-    //console.log('---- After Each : queueTask > Symmetry.Mediator.processingMap',Symmetry.Mediator.processingMap)
-    //console.log('---- After Each : queueTask > Symmetry.Mediator.taskMap',Symmetry.Mediator.taskMap)
-  });
-  
   test('Mediator.resolveTask should return a promise', () => {
     
     let taskName = 'mockServiceMethod';
@@ -373,13 +332,9 @@ describe('Mediator.resolveTask', () => {
     let promise = Symmetry.Mediator.resolveTask(taskName, null, 'mock-property');
     expect(promise instanceof Promise).toBeTruthy();
     Symmetry.Mediator.unregisterService(MockService);
-        
   });
-  
-  
-  
+
   it('Mediator.resolveTask should return a resolve with requested data model property', async () => {
-    
     let taskName = 'mockResolveTask';
     
     class MockService extends Symmetry.Service {
@@ -404,9 +359,6 @@ describe('Mediator.resolveTask', () => {
     } catch (e) {
       console.log('---- error : ', e);
     }
-    
   });
-  
-  
 });//-->
 
