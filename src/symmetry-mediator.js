@@ -166,7 +166,6 @@ class Mediator {
    */
   queueTask(taskName, params){
     let self = this;
-    let paramSignature = '';
     let taskSignature = taskName;
 
     if(typeof taskName !== "string"){
