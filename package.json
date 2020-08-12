@@ -45,7 +45,7 @@
     "node-fetch": "^2.2.0",
     "nodelist-foreach-polyfill": "^1.2.0",
     "regenerator-runtime": "^0.13.2",
-    "serialize-javascript": ">=2.1.1"
+    "serialize-javascript": ">=3.1.0"
   },
   "devDependencies": {
     "@babel/preset-env": "^7.5.4",
