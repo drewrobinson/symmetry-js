@@ -42,7 +42,7 @@
     "babel-register": "^6.26.0",
     "classlist-polyfill": "^1.2.0",
     "match-media": "^0.2.0",
-    "node-fetch": "^2.2.0",
+    "node-fetch": "^2.6.7",
     "nodelist-foreach-polyfill": "^1.2.0",
     "regenerator-runtime": "^0.13.2",
     "serialize-javascript": ">=2.1.1"
